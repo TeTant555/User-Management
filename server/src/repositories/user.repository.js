@@ -1,65 +1,29 @@
-const { sql, pool, poolConnect } = require('../config/db');
+const User = require('../models/user.model');
 
 async function findAll() {
-    await poolConnect;
-    const result = await pool.request().query('SELECT * FROM Users');
-    return result.recordset;
+    return await User.findAll();
 }
 
 async function findById(id) {
-    await poolConnect;
-    const result = await pool
-        .request()
-        .input("UserId", sql.UniqueIdentifier, id)
-        .query('SELECT * FROM Users WHERE UserId = @UserId');
-    return result.recordset[0];
+    return await User.findByPk(id);
 }
 
 async function create(user) {
-    await poolConnect;
-
-    const result = await pool
-        .request()
-        .input("UserName", sql.NVarChar, user.UserName)
-        .input("PassWord", sql.NVarChar, user.PassWord)
-        .input("Email", sql.NVarChar, user.Email)
-        .input("FirstName", sql.NVarChar, user.FirstName)
-        .input("LastName", sql.NVarChar, user.LastName)
-        .query(`
-        INSERT INTO Users (UserName, PassWord, Email, FirstName, LastName)
-        OUTPUT inserted.*
-        VALUES (@UserName, @PassWord, @Email, @FirstName, @LastName)
-        `);
-
-    return result.recordset[0];
+    return await User.create(user);
 }
 
 async function update(id, user) {
-    await poolConnect;
-
-    await pool
-        .request()
-        .input("UserId", sql.UniqueIdentifier, id)
-        .input("FirstName", sql.NVarChar, user.FirstName)
-        .input("LastName", sql.NVarChar, user.LastName)
-        .input("IsActive", sql.Bit, user.IsActive)
-        .query(`
-            UPDATE Users
-            SET FirstName = @FirstName, 
-            LastName = @LastName, 
-            IsActive = @IsActive
-            WHERE UserId = @UserId
-            `);
-
-    return findById(id);
+    const existingUser = await User.findByPk(id);
+    if (!existingUser) return null;
+    await existingUser.update(user);
+    return existingUser;
 }
 
 async function remove(id) {
-    await poolConnect;
-    await pool
-        .request()
-        .input("UserId", sql.UniqueIdentifier, id)
-        .query('DELETE FROM Users WHERE UserId = @UserId');
+    const existingUser = await User.findByPk(id);
+    if (!existingUser) return null;
+    await existingUser.destroy();
+    return existingUser;
 }
 
 module.exports = { findAll, findById, create, update, remove };

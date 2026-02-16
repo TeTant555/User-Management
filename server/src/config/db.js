@@ -1,17 +1,20 @@
-const sql = require('mssql');
+const { Sequelize } = require('sequelize');
 
-const config = {
-    user: "sa",
-    password: "Tetant@12345",
-    server: "THET-TETANT-AUN",
-    port: 9090,
-    database: "UserManagement",
-    options: {
-        trustServerCertificate: true
+const sequelize = new Sequelize(
+    process.env.DB_NAME || 'UserManagement',
+    process.env.DB_USER || 'sa',
+    process.env.DB_PASSWORD || 'Tetant@12345',
+    {
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: Number(process.env.DB_PORT || 9090),
+    dialect: 'mssql',
+    dialectOptions: {
+        options: {
+            encrypt: false,
+            trustServerCertificate: true
+        }
     },
-};
+    logging: false
+});
 
-const pool = new sql.ConnectionPool(config);
-const poolConnect = pool.connect();
-
-module.exports = {sql, pool, poolConnect};
+module.exports = { sequelize };

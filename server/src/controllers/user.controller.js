@@ -25,7 +25,8 @@ async function getUser(req, res) {
 async function createUser(req, res) {
     try {
         const data = await service.createUser(req.body);
-        return sendSuccess(res, 'User created successfully', data, 201);
+        const { PassWord, ...safeUser }  = data;
+        return sendSuccess(res, 'User created successfully', safeUser, 201);
     } catch (err) {
         return sendError(res, err.message || 'Failed to create user', 400);
     }
