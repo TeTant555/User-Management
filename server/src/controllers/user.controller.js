@@ -1,36 +1,58 @@
 const service = require('../services/user.service');
+const { sendSuccess, sendError } = require('../utils/response.util')
 
 async function getUsers(req, res) {
-    const data = await service.getUsers();
-    res.json(data);
+    try {
+        const data = await service.getUsers();
+        return sendSuccess(res, 'Users retrieved successfully', data);
+    } catch (error) {
+        return sendError(res, error.message || 'Failed to retrieve users', 500);
+    }
 }
 
 async function getUser(req, res) {
     try {
         const data = await service.getUser(req.params.id);
-        res.json(data);
+        if (!data) {
+            return sendError(res, 'User not found', 404);
+        }
+        return sendSuccess(res, 'User retrieved successfully', data);
     } catch (err) {
-        res.status(404).json({ message: err.message });
+        return sendError(res, err.message || 'Failed to retrieve user', 500);
     }
 }
 
 async function createUser(req, res) {
     try {
         const data = await service.createUser(req.body);
-        res.status(201).json(data);
+        return sendSuccess(res, 'User created successfully', data, 201);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        return sendError(res, err.message || 'Failed to create user', 400);
     }
 }
 
 async function updateUser(req, res) {
-    const data = await service.updateUser(req.params.id, req.body);
-    res.json(data);
+    try {
+        const data = await service.updateUser(req.params.id, req.body);
+        if (!data) {
+            return sendError(res, 'User not found', 404);
+        }
+        return sendSuccess(res, 'User updated successfully', data);
+    } catch (err) {
+        return sendError(res, err.message || 'Failed to update user', 400);
+    }
 }
 
 async function deleteUser(req, res) {
-    await service.deleteUser(req.params.id);
-    res.json({ message: 'User deleted successfully' });
+    try {
+        const deleted = await service.deleteUser(req.params.id);
+        if (!deleted) {
+            return sendError(res, 'User not found', 404);
+        }
+        return sendSuccess(res, 'User deleted successfully', { id: req.params.id });
+    } catch (err) {
+        return sendError(res, err.message || 'Failed to delete user', 500);
+    }
 }
 
 module.exports = {
