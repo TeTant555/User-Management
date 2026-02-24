@@ -15,8 +15,10 @@ async function createUser(data) {
     if (!data.UserName || !data.PassWord || !data.Email || !data.FirstName || !data.LastName) {
         throw new Error('Missing required fields');
     }
-    const hashedPassword = await bcrypt.hash(data.PassWord, 10);
-    const userToCreate = {...data, PassWord: hashedPassword };
+    const userToCreate = {
+        ...data,
+        PassWord: await bcrypt.hash(data.PassWord, 10)
+    };
     return await repo.create(userToCreate);
 }
 
@@ -29,7 +31,7 @@ async function updateUser(id, data) {
 }
 
 async function deleteUser(id) {
-    await repo.remove(id);
+    return await repo.remove(id);
 }
 
 module.exports = {

@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const { sequelize } = require('../config/db');
 
 const User = sequelize.define(
@@ -36,7 +36,7 @@ const User = sequelize.define(
         },
         CreatedAt: {
             type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW
+            defaultValue: Sequelize.literal('GETDATE()')
         },
         LastLogin: {
             type: DataTypes.DATE,
