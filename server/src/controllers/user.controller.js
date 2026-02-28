@@ -22,6 +22,22 @@ async function getUser(req, res) {
     }
 }
 
+async function login(req, res) {
+    try {
+        const { Email, PassWord } = req.body;
+        
+        if (!Email || !PassWord) {
+            return sendError(res, 'Email and Password are required');
+        }
+
+        const data = await service.login(Email, PassWord);
+
+        return sendSuccess(res, 'Login successful', data, 200);
+    } catch (err) {
+        return sendError(res, err.message || 'Login failed', 401);
+    }
+}
+
 async function createUser(req, res) {
     try {
         const data = await service.createUser(req.body);
@@ -59,6 +75,7 @@ async function deleteUser(req, res) {
 module.exports = {
     getUsers,
     getUser,
+    login,
     createUser,
     updateUser,
     deleteUser

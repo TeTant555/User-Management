@@ -1,5 +1,6 @@
 const repo = require('../repositories/user.repository');
 const bcrypt = require('bcrypt');
+const { generateToken } = require('../utils/jwt.util');
 
 async function getUsers() {
     return await repo.findAll();
@@ -9,6 +10,26 @@ async function getUser(id) {
     const user = await repo.findById(id);
     if (!user) throw new Error('User not found');
     return user;
+}
+
+async function login(email, password) {
+    const user = await repo.findByEmail(email);
+    if (!user) {
+        throw new Error('Invalid email or password');
+    }
+    const isMatch = await bcrypt.compare(password, user.PassWord);
+    if (!isMatch) {
+        throw new Error('Invalid email or password');
+    }
+    
+    const now = new Date();
+    await repo.update(user.id, { LastLogin: now });
+    user.LastLogin = now;
+    
+    const token = generateToken(user);
+    const userJson = user.toJSON();
+    delete userJson.PassWord;
+    return { user: userJson, token };
 }
 
 async function createUser(data) {
@@ -39,5 +60,6 @@ module.exports = {
     getUser,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    login
 }
