@@ -38,6 +38,20 @@ async function login(req, res) {
     }
 }
 
+async function googleLogin(req, res) {
+    try {
+        const { idToken } = req.body;
+        if (!idToken) {
+            return sendError(res, 'Google ID token is required');
+        }
+        const data = await service.googleLogin(idToken);
+        return sendSuccess(res, 'Google login successful', data, 200);
+    } catch (err) {
+        console.error('Google Auth error:', err);
+        return sendError(res, err.message || 'Google login failed', 401);
+    }
+}
+
 async function createUser(req, res) {
     try {
         const data = await service.createUser(req.body);
@@ -78,5 +92,6 @@ module.exports = {
     login,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    googleLogin,
 };
