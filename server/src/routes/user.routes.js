@@ -7,7 +7,7 @@ router.get('/users', controller.getUsers);
 router.get('/userById/:id', controller.getUser);
 router.post('/login', controller.login);
 router.post('/googleLogin', controller.googleLogin);
-router.post('/createUser', controller.createUser);
+router.post('/register', controller.createUser);
 router.put('/updateUser/:id', controller.updateUser);
 router.delete('/deleteUser/:id', controller.deleteUser);
 
