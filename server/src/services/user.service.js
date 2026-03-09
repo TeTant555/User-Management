@@ -76,9 +76,6 @@ async function googleLogin(idToken) {
 }
 
 async function createUser(data) {
-    if (!data.UserName || !data.PassWord || !data.Email || !data.FirstName || !data.LastName) {
-        throw new Error('Missing required fields');
-    }
     const userToCreate = {
         ...data,
         PassWord: await bcrypt.hash(data.PassWord, 10)
